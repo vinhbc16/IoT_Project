@@ -18,7 +18,7 @@ router.use(authMiddleware);
  *     tags:
  *       - Control
  *     summary: Điều khiển thiết bị
- *     description: Bật/Tắt các thiết bị như máy bơm, đèn, quạt
+ *     description: Bật/Tắt máy bơm
  *     security:
  *       - bearerAuth: []
  *     requestBody:
@@ -28,17 +28,15 @@ router.use(authMiddleware);
  *           schema:
  *             type: object
  *             required:
- *               - deviceId
- *               - action
+ *               - pump
  *             properties:
- *               deviceId:
+ *               sensorId:
  *                 type: string
- *                 description: ID của thiết bị
- *                 enum: [PUMP, LIGHT, FAN]
- *                 example: PUMP
- *               action:
+ *                 description: ID của sensor (optional, mặc định esp32-27)
+ *                 example: esp32-27
+ *               pump:
  *                 type: string
- *                 description: Hành động
+ *                 description: Trạng thái bơm
  *                 enum: [ON, OFF]
  *                 example: ON
  *     responses:
@@ -54,9 +52,13 @@ router.use(authMiddleware);
  *                   example: true
  *                 message:
  *                   type: string
- *                   example: Device PUMP is being turned ON
+ *                   example: Pump is being turned ON
  *                 data:
  *                   type: object
+ *                   properties:
+ *                     message:
+ *                       type: string
+ *                       example: Command sent successfully
  *       400:
  *         description: Dữ liệu không hợp lệ
  *       503:
@@ -65,17 +67,17 @@ router.use(authMiddleware);
 router.post(
   '/device',
   [
-    body('deviceId')
+    body('sensorId')
+      .optional()
       .trim()
       .notEmpty()
-      .withMessage('deviceId is required')
-      .toUpperCase(),
-    body('action')
+      .withMessage('sensorId cannot be empty'),
+    body('pump')
       .trim()
       .notEmpty()
-      .withMessage('action is required')
+      .withMessage('pump is required')
       .isIn(['ON', 'OFF', 'on', 'off'])
-      .withMessage('action must be ON or OFF'),
+      .withMessage('pump must be ON or OFF'),
     validateRequest,
   ],
   controlController.controlDevice

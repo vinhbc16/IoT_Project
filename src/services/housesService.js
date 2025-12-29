@@ -13,7 +13,6 @@ const housesAPI = axios.create({
   timeout: 10000, // 10 seconds
   headers: {
     'Content-Type': 'application/json',
-    'X-API-Key': config.HOUSES_SERVER_API_KEY, // API Key để xác thực giữa 2 servers
   },
 });
 
@@ -46,11 +45,14 @@ housesAPI.interceptors.response.use(
 
 /**
  * Lấy dữ liệu cảm biến mới nhất (real-time)
- * GET /api/internal/latest
+ * GET /api/device/status/?sensorId=esp32-27
+ * @param {String} sensorId - ID của sensor (mặc định: esp32-27)
  */
-const getLatestSensorData = async () => {
+const getLatestSensorData = async (sensorId = 'esp32-27') => {
   try {
-    const response = await housesAPI.get('/latest');
+    const response = await housesAPI.get('/device/status/', {
+      params: { sensorId }
+    });
     return {
       success: true,
       data: response.data,
@@ -66,12 +68,18 @@ const getLatestSensorData = async () => {
 
 /**
  * Lấy lịch sử dữ liệu cảm biến
- * GET /api/internal/history
- * @param {Object} params - Query parameters (startDate, endDate, type)
+ * GET /api/history/?sensorId=esp32-27&from=...&to=...
+ * @param {String} sensorId - ID của sensor
+ * @param {String} from - Thời gian bắt đầu (ISO 8601 format)
+ * @param {String} to - Thời gian kết thúc (ISO 8601 format)
  */
-const getSensorHistory = async (params) => {
+const getSensorHistory = async (sensorId = 'esp32-27', from, to) => {
   try {
-    const response = await housesAPI.get('/history', { params });
+    const params = { sensorId };
+    if (from) params.from = from;
+    if (to) params.to = to;
+    
+    const response = await housesAPI.get('/history/', { params });
     return {
       success: true,
       data: response.data,
@@ -87,15 +95,15 @@ const getSensorHistory = async (params) => {
 
 /**
  * Gửi lệnh điều khiển thiết bị
- * POST /api/internal/command
- * @param {String} deviceId - ID của thiết bị (PUMP, LIGHT, etc.)
- * @param {String} action - Hành động (ON, OFF)
+ * POST /api/command/
+ * @param {String} sensorId - ID của sensor (mặc định: esp32-27)
+ * @param {String} pump - Trạng thái bơm (ON, OFF)
  */
-const sendDeviceCommand = async (deviceId, action) => {
+const sendDeviceCommand = async (sensorId = 'esp32-27', pump) => {
   try {
-    const response = await housesAPI.post('/command', {
-      deviceId,
-      action,
+    const response = await housesAPI.post('/command/', {
+      sensorId,
+      pump,
     });
     return {
       success: true,
@@ -110,25 +118,7 @@ const sendDeviceCommand = async (deviceId, action) => {
   }
 };
 
-/**
- * Lấy trạng thái tất cả thiết bị
- * GET /api/internal/devices/status
- */
-const getDevicesStatus = async () => {
-  try {
-    const response = await housesAPI.get('/devices/status');
-    return {
-      success: true,
-      data: response.data,
-    };
-  } catch (error) {
-    throw {
-      success: false,
-      message: error.response?.data?.message || 'Failed to fetch devices status',
-      statusCode: error.response?.status || 500,
-    };
-  }
-};
+
 
 /**
  * Health check - Kiểm tra Houses Server có hoạt động không
@@ -153,6 +143,5 @@ module.exports = {
   getLatestSensorData,
   getSensorHistory,
   sendDeviceCommand,
-  getDevicesStatus,
   checkHealth,
 };

@@ -17,10 +17,22 @@ const userConfigSchema = new mongoose.Schema({
       default: false,
     },
   },
+  // Sensor ID người dùng đang theo dõi
+  sensor_id: {
+    type: String,
+    default: 'esp32-27',
+  },
+  // Ngưỡng cảnh báo
   thresholds: {
     max_temp: {
       type: Number,
       default: 35,
+      min: 0,
+      max: 100,
+    },
+    min_temp: {
+      type: Number,
+      default: 15,
       min: 0,
       max: 100,
     },
@@ -33,6 +45,12 @@ const userConfigSchema = new mongoose.Schema({
     max_humidity: {
       type: Number,
       default: 80,
+      min: 0,
+      max: 100,
+    },
+    min_soil_moisture: {
+      type: Number,
+      default: 20,
       min: 0,
       max: 100,
     },

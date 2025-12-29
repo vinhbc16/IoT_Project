@@ -8,43 +8,43 @@ const housesService = require('../services/housesService');
 
 /**
  * @route   POST /api/v1/control/device
- * @desc    Điều khiển thiết bị (Bật/Tắt máy bơm, đèn, etc.)
- * @body    { deviceId: "PUMP", action: "ON" }
+ * @desc    Điều khiển thiết bị (Bật/Tắt máy bơm)
+ * @body    { sensorId: "esp32-27" (optional), pump: "ON" }
  * @access  Private
  */
 const controlDevice = async (req, res, next) => {
   try {
-    const { deviceId, action } = req.body;
+    const { sensorId, pump } = req.body;
 
     // Validate input
-    if (!deviceId || !action) {
+    if (!pump) {
       return res.status(400).json({
         success: false,
-        message: 'deviceId and action are required',
+        message: 'pump is required',
       });
     }
 
-    // Validate action
-    const validActions = ['ON', 'OFF'];
-    if (!validActions.includes(action.toUpperCase())) {
+    // Validate pump state
+    const validStates = ['ON', 'OFF'];
+    if (!validStates.includes(pump.toUpperCase())) {
       return res.status(400).json({
         success: false,
-        message: 'Invalid action. Must be ON or OFF',
+        message: 'Invalid pump state. Must be ON or OFF',
       });
     }
 
     // Gọi sang Houses_server để gửi lệnh
     const result = await housesService.sendDeviceCommand(
-      deviceId.toUpperCase(),
-      action.toUpperCase()
+      sensorId,
+      pump.toUpperCase()
     );
 
     // Log hành động của user (optional - có thể lưu vào DB)
-    console.log(`User ${req.user.username} controlled device ${deviceId}: ${action}`);
+    console.log(`User ${req.user.username} controlled pump: ${pump}`);
 
     res.status(200).json({
       success: true,
-      message: `Device ${deviceId} is being turned ${action}`,
+      message: `Pump is being turned ${pump}`,
       data: result.data,
     });
   } catch (error) {

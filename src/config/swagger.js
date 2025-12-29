@@ -66,6 +66,10 @@ const options = {
         UserConfig: {
           type: 'object',
           properties: {
+            sensor_id: {
+              type: 'string',
+              example: 'esp32-27',
+            },
             notifications: {
               type: 'object',
               properties: {
@@ -86,6 +90,10 @@ const options = {
                   type: 'number',
                   example: 35,
                 },
+                min_temp: {
+                  type: 'number',
+                  example: 15,
+                },
                 min_humidity: {
                   type: 'number',
                   example: 40,
@@ -93,6 +101,10 @@ const options = {
                 max_humidity: {
                   type: 'number',
                   example: 80,
+                },
+                min_soil_moisture: {
+                  type: 'number',
+                  example: 20,
                 },
                 min_light: {
                   type: 'number',
@@ -109,25 +121,48 @@ const options = {
         SensorData: {
           type: 'object',
           properties: {
+            _id: {
+              type: 'string',
+              example: '695265647b645bbe408d494c',
+            },
+            sensorId: {
+              type: 'string',
+              example: 'esp32-27',
+            },
             temperature: {
               type: 'number',
-              example: 28.5,
+              example: 23.1,
+              description: 'Nhiệt độ (°C)',
             },
             humidity: {
               type: 'number',
-              example: 65,
+              example: 77.8,
+              description: 'Độ ẩm (%)',
             },
-            light: {
+            soil_moisture: {
               type: 'number',
-              example: 850,
+              example: 0,
+              description: 'Độ ẩm đất (%)',
             },
-            pump_status: {
+            light_level: {
+              type: 'number',
+              example: 46,
+              description: 'Cường độ ánh sáng',
+            },
+            status: {
               type: 'string',
-              example: 'OFF',
+              example: 'ONLINE',
+              description: 'Trạng thái thiết bị',
+            },
+            pump_state: {
+              type: 'string',
+              example: 'ON',
+              description: 'Trạng thái bơm',
             },
             timestamp: {
               type: 'string',
               format: 'date-time',
+              example: '2025-12-29T11:26:28.936Z',
             },
           },
         },

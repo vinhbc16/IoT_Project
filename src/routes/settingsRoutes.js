@@ -54,6 +54,9 @@ router.get('/', settingsController.getSettings);
  *           schema:
  *             type: object
  *             properties:
+ *               sensor_id:
+ *                 type: string
+ *                 example: esp32-27
  *               notifications:
  *                 type: object
  *                 properties:
@@ -69,12 +72,18 @@ router.get('/', settingsController.getSettings);
  *                   max_temp:
  *                     type: number
  *                     example: 35
+ *                   min_temp:
+ *                     type: number
+ *                     example: 15
  *                   min_humidity:
  *                     type: number
  *                     example: 40
  *                   max_humidity:
  *                     type: number
  *                     example: 80
+ *                   min_soil_moisture:
+ *                     type: number
+ *                     example: 20
  *                   min_light:
  *                     type: number
  *                     example: 200
@@ -98,6 +107,11 @@ router.get('/', settingsController.getSettings);
 router.put(
   '/',
   [
+    body('sensor_id')
+      .optional()
+      .trim()
+      .notEmpty()
+      .withMessage('sensor_id cannot be empty'),
     body('notifications.email_alert')
       .optional()
       .isBoolean()
@@ -110,6 +124,10 @@ router.put(
       .optional()
       .isNumeric()
       .withMessage('max_temp must be a number'),
+    body('thresholds.min_temp')
+      .optional()
+      .isNumeric()
+      .withMessage('min_temp must be a number'),
     body('thresholds.min_humidity')
       .optional()
       .isNumeric()
@@ -118,6 +136,10 @@ router.put(
       .optional()
       .isNumeric()
       .withMessage('max_humidity must be a number'),
+    body('thresholds.min_soil_moisture')
+      .optional()
+      .isNumeric()
+      .withMessage('min_soil_moisture must be a number'),
     body('thresholds.min_light')
       .optional()
       .isNumeric()
