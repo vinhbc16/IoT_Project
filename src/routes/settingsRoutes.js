@@ -12,17 +12,88 @@ const router = express.Router();
 router.use(authMiddleware);
 
 /**
- * @route   GET /api/v1/settings
- * @desc    Lấy cấu hình của user hiện tại
- * @access  Private
+ * @swagger
+ * /settings:
+ *   get:
+ *     tags:
+ *       - Settings
+ *     summary: Lấy cấu hình người dùng
+ *     description: Lấy cấu hình thông báo và ngưỡng cảnh báo của user
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Thành công
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 data:
+ *                   $ref: '#/components/schemas/UserConfig'
  */
 router.get('/', settingsController.getSettings);
 
 /**
- * @route   PUT /api/v1/settings
- * @desc    Cập nhật cấu hình của user
- * @body    { notifications: {...}, thresholds: {...} }
- * @access  Private
+ * @swagger
+ * /settings:
+ *   put:
+ *     tags:
+ *       - Settings
+ *     summary: Cập nhật cấu hình người dùng
+ *     description: Cập nhật cấu hình thông báo và ngưỡng cảnh báo
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               notifications:
+ *                 type: object
+ *                 properties:
+ *                   email_alert:
+ *                     type: boolean
+ *                     example: true
+ *                   push_alert:
+ *                     type: boolean
+ *                     example: false
+ *               thresholds:
+ *                 type: object
+ *                 properties:
+ *                   max_temp:
+ *                     type: number
+ *                     example: 35
+ *                   min_humidity:
+ *                     type: number
+ *                     example: 40
+ *                   max_humidity:
+ *                     type: number
+ *                     example: 80
+ *                   min_light:
+ *                     type: number
+ *                     example: 200
+ *     responses:
+ *       200:
+ *         description: Cập nhật thành công
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 message:
+ *                   type: string
+ *                   example: Settings updated successfully
+ *                 data:
+ *                   $ref: '#/components/schemas/UserConfig'
  */
 router.put(
   '/',

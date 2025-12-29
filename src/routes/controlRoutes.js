@@ -12,10 +12,55 @@ const router = express.Router();
 router.use(authMiddleware);
 
 /**
- * @route   POST /api/v1/control/device
- * @desc    Điều khiển thiết bị (Bật/Tắt máy bơm, đèn, etc.)
- * @body    { deviceId: "PUMP", action: "ON" }
- * @access  Private
+ * @swagger
+ * /control/device:
+ *   post:
+ *     tags:
+ *       - Control
+ *     summary: Điều khiển thiết bị
+ *     description: Bật/Tắt các thiết bị như máy bơm, đèn, quạt
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - deviceId
+ *               - action
+ *             properties:
+ *               deviceId:
+ *                 type: string
+ *                 description: ID của thiết bị
+ *                 enum: [PUMP, LIGHT, FAN]
+ *                 example: PUMP
+ *               action:
+ *                 type: string
+ *                 description: Hành động
+ *                 enum: [ON, OFF]
+ *                 example: ON
+ *     responses:
+ *       200:
+ *         description: Lệnh điều khiển thành công
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 message:
+ *                   type: string
+ *                   example: Device PUMP is being turned ON
+ *                 data:
+ *                   type: object
+ *       400:
+ *         description: Dữ liệu không hợp lệ
+ *       503:
+ *         description: Houses Server không khả dụng
  */
 router.post(
   '/device',

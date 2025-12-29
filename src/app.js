@@ -1,7 +1,9 @@
 const express = require('express');
 const cors = require('cors');
+const swaggerUi = require('swagger-ui-express');
 const connectDB = require('./config/db');
 const config = require('./config');
+const swaggerSpec = require('./config/swagger');
 const routes = require('./routes');
 const { errorMiddleware, notFoundMiddleware } = require('./middlewares/errorMiddleware');
 
@@ -37,6 +39,12 @@ if (config.NODE_ENV === 'development') {
 // ROUTES
 // ===========================
 
+// Swagger Documentation
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec, {
+  customCss: '.swagger-ui .topbar { display: none }',
+  customSiteTitle: 'IoT UI Backend API Docs',
+}));
+
 // API Routes
 app.use('/api/v1', routes);
 
@@ -46,7 +54,8 @@ app.get('/', (req, res) => {
     success: true,
     message: 'UI Backend API is running',
     version: '1.0.0',
-    documentation: '/api/v1/health',
+    documentation: '/api-docs',
+    health: '/api/v1/health',
   });
 });
 
