@@ -19,7 +19,7 @@ const options = {
         description: 'Development server',
       },
       {
-        url: 'https://iot-project-i0p1.onrender.com',
+        url: 'https://iot-project-i0p1.onrender.com/api/v1',
         description: 'Production server',
       },
     ],
